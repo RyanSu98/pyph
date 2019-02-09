@@ -61,12 +61,12 @@ def download_list(list_uri):
 	list_page_content = get_page_content(list_uri).content
 	list_page_bs = BeautifulSoup(list_page_content, 'html.parser')
 	# 2. 获取视频列表
-	if len(bs_page.findAll(class_='noVideosNotice')) == 1:
+	if len(list_page_bs.findAll(class_='noVideosNotice')) == 1:
 		print('未发现视频链接')
 		exit()
 	video_uri_array = []
-	for video_li_tag in bs_page.findAll(id='videoCategory')[0].findAll('li'):
-		video_uri_array.append(video_li_tag.a['href'])
+	for video_li_tag in list_page_bs.findAll(id='videoCategory')[0].findAll('li'):
+		video_uri_array.append('https://www.pornhub.com' + video_li_tag.a['href'])
 	# 3. 依次下载视频
 	for video_uri in video_uri_array:
 		download_video(video_uri)
@@ -76,15 +76,8 @@ def get_page_content(uri):
 	""" 获取网页内容 """
 	# 1. 获取代理配置信息
 	proxy = json.load(open('config.json'))['proxy'].strip()
-	# 2. 重试三次获取网页内容
-	for i in [1,2,3]:
-		try:
-			return requests.get(uri, proxies=dict(http=proxy, https=proxy))
-		except:
-			continue
-		break
-	print('获取网页内容失败')
-	exit()
+	# 2. 重获取网页内容
+	return requests.get(uri, proxies=dict(http=proxy, https=proxy))
 
 
 def axel_download(file_name, file_uri):
@@ -109,4 +102,10 @@ def axel_download(file_name, file_uri):
 
 
 if __name__ == "__main__":
-	pyph(sys.argv[1])
+	if len(sys.argv) == 0:
+		print('python3 pyph.py https://copied.uri/')
+	else:
+		try:
+			pyph(sys.argv[1])
+		except:
+			print('下载出现错误')

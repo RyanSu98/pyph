@@ -108,4 +108,4 @@ if __name__ == "__main__":
 		try:
 			pyph(sys.argv[1])
 		except:
-			print('下载出现错误')
+			print('下载出现异常')
